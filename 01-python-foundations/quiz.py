@@ -1,3 +1,5 @@
+import datetime
+import json
 import random
 
 questions = {
@@ -29,6 +31,16 @@ explanations = {
 items = list(questions.items())
 random.shuffle(items)
 wrong = []
+try:
+    with open("scores.json") as f:
+        past = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError):
+    past = []  # pehli baar file nahi hogi
+
+if past:
+    runs = [s["score"] for s in past]
+    print(f"📊 Last runs: {runs} | Best: {max(runs)}\n")
+
 score = 0
 
 print("=== AI INTERVIEW PREP QUIZ ===\n")
@@ -50,6 +62,12 @@ for q, a in items:
     except KeyboardInterrupt:
         print("\n\nCancelled.")
         break
+
+entry = {"date": datetime.date.today().isoformat(), "score": score}  # '2026-11-24'
+past.append(entry)
+with open("scores.json", "w") as f:
+    json.dump(past, f, indent=2)
+print(f"💾 Saved! Total runs: {len(past)}")
 
 print(f"\n=== Final: {score}/{len(questions)} ===")
 if wrong:
